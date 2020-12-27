@@ -1,0 +1,60 @@
+from drozer.modules import Module, common
+from drozer import android
+import M2Crypto
+import subprocess
+from OpenSSL import crypto
+class Info(Module,common.Filters,common.PackageManager):
+	name = "Print the Signer certificate for an application"
+	description = "this module allows you to print the signer x509 certificate for a given applicaiton"
+	examples = "run ex.cert.info -p com.android.browser"
+	author = "Keith Makan"
+	date = "11-11-2013"
+	license = "GNU GPL"
+	path = ["ex","cert"]
+	def add_arguments(self, parse):
+		parse.add_argument("-p","--package",default=None,help="The Package Name")
+	def execute(self,arguments):
+		pm = self.packageManager()
+		if arguments.package == None:
+			for info in pm.getPackages(common.PackageManager.GET_SIGNATURES):
+				self.stdout.write("[*] certificate info for {%s}\n" % (info.packageName))
+				self.__print_certs(info)
+		elif arguments.package != None:
+			self.stdout.write("[*] certificate info for {%s}\n" % (arguments.package))
+			info = pm.getPackageInfo(arguments.package,common.PackageManager.GET_SIGNATURES)
+			self.__print_certs(info)
+		else:
+			self.stdout.write("[!] cannot process arguments : '%s'\n" % (repr(arguments)))	
+	def __print_certs(self,info):
+		sigs = info.signatures[0].toCharsString()
+		sigs = sigs + '\n'
+		temp_cert = open("/tmp/cert.crt","w")
+		end = 2
+		#converting to DER file
+		for start in range(0,len(sigs)-2,2):
+			temp_cert.write(chr(int(sigs[start:end],16)))
+			end +=2
+		temp_cert.flush()
+		temp_pem = open("/tmp/cert.pem","w")
+		temp_pem.flush()
+		temp_pem.close()
+		certtext = subprocess.check_output(["openssl","x509","-inform","DER","-in","/tmp/cert.crt","-outform","PEM","-out","/tmp/cert.pem","-text"])
+		temp_pem = open("/tmp/cert.pem","r")
+		pem_cert_string = temp_pem.read()
+		temp_pem.close()
+		x509cert = crypto.load_certificate(crypto.FILETYPE_PEM,pem_cert_string)	
+		m2crypto_crt = M2Crypto.X509.load_cert_string(pem_cert_string,1)
+		self.stdout.write("[*] Version : %s\n" % (x509cert.get_version()))
+		self.stdout.write("[*] Issuer : %s\n" % (self._print_x509Name(x509cert.get_issuer())))
+		self.stdout.write("[*] Subject : %s\n" % (self._print_x509Name(x509cert.get_subject())))
+		self.stdout.write("[*] Algorithm : %s\n" % (x509cert.get_signature_algorithm()))
+		self.stdout.write("[*] NotBefore : %s\n" % (x509cert.get_notBefore()))
+		self.stdout.write("[*] NotAfter : %s\n" % (x509cert.get_notAfter()))
+		self.stdout.write("[*] Key Length : %s\n" % (x509cert.get_pubkey().bits()))
+		self.stdout.write("[*] Public Key : \n%s\n" % (self._print_key(m2crypto_crt)))
+		self.stdout.write("\n")
+		#self.stdout.write("\n%s\n" % (certtext))
+	def _print_x509Name(self,xname):
+		return ''.join(["%s=%s " % (i[0],i[1]) for i in xname.get_components()]) 
+	def _print_key(self,m2cert):
+		return m2cert.get_pubkey().get_rsa().as_pem()

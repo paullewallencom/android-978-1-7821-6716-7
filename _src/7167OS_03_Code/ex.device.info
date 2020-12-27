@@ -1,0 +1,25 @@
+from drozer.modules import Module
+class Info(Module):
+	name = "Get Device info"
+	description = "A module that returns information about the device and hardware features"
+	examples = "run ex.device.info"
+	date = "10-11-13"
+	author = "Keith Makan"
+	license = "GNU GPL"
+	path = ["ex","device"]
+	def execute(self,arguments):
+		build = self.new("android.os.Build")
+		self.stdout.write("Getting device info...\n")
+		self.stdout.write("[*] BOARD : %s\n" % (build.BOARD))
+		self.stdout.write("[*] BOOTLOADER : %s\n" % (build.BOOTLOADER))
+		self.stdout.write("[*] BRAND : %s\n" % (build.BRAND))
+		self.stdout.write("[*] CPU_ABI : %s\n" % (build.CPU_ABI))
+		self.stdout.write("[*] CPU_ABI2 : %s\n" % (build.CPU_ABI2))
+		self.stdout.write("[*] DEVICE : %s\n" % (build.DEVICE))
+		self.stdout.write("[*] DISPLAY : %s\n" % (build.DISPLAY))
+		self.stdout.write("[*] FINGERPRINT : %s\n" % (build.FINGERPRINT))
+		self.stdout.write("[*] HARDWARE : %s\n" % (build.HARDWARE))
+		self.stdout.write("[*] MANUFACTURER : %s\n" % (build.MANUFACTURER))
+		self.stdout.write("[*] MODEL : %s\n" % (build.MODEL))
+		self.stdout.write("[*] TAGS : %s\n" % (build.TAGS))
+

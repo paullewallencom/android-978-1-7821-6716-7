@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Chapter9-Encryption and Ent</string>
+    <string name="title_activity_app_policy">App Device Policy</string>
+    <string name="device_admin_disable_policy">Are you sure, app user data and settings will be cleared for your safety</string>
+    <string name="device_admin_activation_message">Enable this app as a device administrator</string>
+    <string name="device_admin_activated_message">Yay, device administrator activated</string>
+    <string name="device_admin_policy_breach_message">You are in breach of security policy</string>
+
+</resources>

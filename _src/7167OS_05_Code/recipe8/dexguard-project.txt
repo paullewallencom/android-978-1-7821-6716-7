@@ -1,0 +1,9 @@
+# Dexguard config
+
+-encryptstrings interface com.packt.android.security.Constants {public static final java.lang.String CERTIFICATE_SHA1;}
+-encryptstrings class com.packt.android.security.MainActivity
+
+-accessthroughreflection class com.packt.android.security.Tamper {    boolean verifyAppSignature (Context);}-accessthroughreflection class android.content.pm.PackageManager {    int checkSignatures(int, int);    int checkSignatures(java.lang.String, java.lang.String);    android.content.pm.PackageInfo getPackageInfo(java.lang.String, int);}-accessthroughreflection class android.content.pm.Signature {    byte[]           toByteArray();    char[]           toChars();    java.lang.String toCharsString();}
+
+
+
